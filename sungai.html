@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Sungai Tenang</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🏞️ Sungai Tenang</h1>
+  <p>Sungai ini jernih dan menyegarkan. Banyak petualang suka bersantai di sini.</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div class="grid">
+    <button class="btn" onclick="drink()">💧 Minum Air Sungai</button>
+    <button class="btn" onclick="fish()">🎣 Mancing Ikan</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <p class="info" id="result">Pilih aktivitas di sungai...</p>
+
+  <script>
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function drink() {
+      let hp = parseInt(localStorage.getItem("health") || 100);
+      let bonus = Math.floor(Math.random() * 11) + 5; // +5 ~ +15
+      hp = Math.min(hp + bonus, 100);
+      localStorage.setItem("health", hp);
+      document.getElementById("result").innerText = `💧 Kamu minum air segar dan pulih +${bonus} HP!`;
+      updateHUD();
+    }
+
+    function fish() {
+      let result = document.getElementById("result");
+      const chance = Math.random();
+
+      if (chance < 0.5) {
+        result.innerText = "🐟 Kamu menangkap ikan kecil.";
+        addItem("Ikan Segar");
+      } else if (chance < 0.8) {
+        result.innerText = "🎣 Kamu dapat ikan besar! +20 Gold!";
+        addItem("Ikan Besar");
+        addGold(20);
+      } else {
+        result.innerText = "😞 Kailmu kosong hari ini.";
+      }
+
+      updateHUD();
+    }
+
+    function addItem(item) {
+      let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      inv.push(item);
+      localStorage.setItem("inventory", JSON.stringify(inv));
+    }
+
+    function addGold(amount) {
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      gold += amount;
+      localStorage.setItem("gold", gold);
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

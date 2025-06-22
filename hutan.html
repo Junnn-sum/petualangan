@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hutan Liar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>🌳 Hutan Liar</h1>
+    <p>Hutan ini penuh monster dan sumber daya misterius...</p>
+
+    <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+    <div class="grid">
+        <button class="btn" onclick="useSkill('quick')">⚔️ Serangan Cepat</button>
+        <button class="btn" onclick="useSkill('strong')">💥 Serangan Kuat</button>
+        <button class="btn" onclick="useSkill('defend')">🛡️ Bertahan</button>
+        <button class="btn" onclick="useSkill('ultimate')">🔥 Ultimate</button>
+        <button class="btn" onclick="battle()">🔥 Jelajahi & Lawan Monster</button>
+        <button class="btn" onclick="explore()">🎒 Cari Item</button>
+        <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+    </div>
+
+    <p class="info" id="result">Pilih aksi...</p>
+
+    <script>
+        function updateHUD() {
+            const hud = document.getElementById("hud");
+            const name = localStorage.getItem("nickname");
+            const classType = localStorage.getItem("class");
+            const level = localStorage.getItem("level");
+            const exp = localStorage.getItem("exp");
+            const hp = localStorage.getItem("health");
+            const gold = localStorage.getItem("gold");
+            const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+        }
+
+        function gainExp(amount) {
+            let exp = parseInt(localStorage.getItem("exp") || 0);
+            let level = parseInt(localStorage.getItem("level") || 1);
+            exp += amount;
+            if (exp >= level * 100) {
+                level++;
+                exp = 0;
+                localStorage.setItem("level", level);
+                localStorage.setItem("health", 100); // 🎉 Pulihkan HP saat level up
+                alert("🎉 Level Up ke " + level + "! HP dipulihkan penuh!");
+            }
+            localStorage.setItem("exp", exp);
+        }
+
+
+        function addItem(item) {
+            let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            inv.push(item);
+            localStorage.setItem("inventory", JSON.stringify(inv));
+        }
+
+        function addGold(amount) {
+            let gold = parseInt(localStorage.getItem("gold") || 0);
+            gold += amount;
+            localStorage.setItem("gold", gold);
+        }
+
+        function damage(amount) {
+            let hp = parseInt(localStorage.getItem("health") || 100);
+            hp -= amount;
+            if (hp < 0) hp = 0;
+            localStorage.setItem("health", hp);
+            checkDeath();
+        }
+
+        function checkDeath() {
+            const hp = parseInt(localStorage.getItem("health") || 0);
+            if (hp <= 0) {
+                alert("☠️ Kamu mati... petualangan harus dimulai kembali!");
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        }
+
+        function battle() {
+            const result = document.getElementById("result");
+            const chance = Math.random();
+
+            if (chance > 0.5) {
+                result.innerText = "🎉 Kamu mengalahkan monster dan mendapat 30 EXP + 50 gold!";
+                gainExp(30);
+                addGold(50);
+                let monsterCount = parseInt(localStorage.getItem("monsterHutan") || 0);
+                monsterCount++;
+                localStorage.setItem("monsterHutan", monsterCount);
+
+            } else {
+                result.innerText = "💀 Kamu terkena serangan monster! -20 HP";
+                damage(20);
+            }
+
+            updateHUD();
+        }
+
+        function explore() {
+            const result = document.getElementById("result");
+            const chance = Math.random();
+
+            if (chance < 0.4) {
+                result.innerText = "🌿 Kamu menemukan tanaman langka.";
+                addItem("Tanaman Langka");
+            } else if (chance < 0.8) {
+                result.innerText = "🧟 Kamu bertarung dan mengalahkan monster!";
+                gainExp(20);
+
+                // ✅ Tambahkan progres misi di sini:
+                let monsterCount = parseInt(localStorage.getItem("monsterHutan") || 0);
+                monsterCount++;
+                localStorage.setItem("monsterHutan", monsterCount);
+
+            } else {
+                result.innerText = "✨ Kamu menemukan peti dan mendapat 15 gold!";
+                addGold(15);
+            }
+
+            updateHUD();
+        }
+
+
+        function goBack() {
+            window.location.href = "map.html";
+        }
+
+        updateHUD();
+    </script>
+</body>
+
+</html>

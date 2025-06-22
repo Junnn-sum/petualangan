@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Cutscene Lanjutan</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1605647540922-cb6d09ac548d?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .cutscene {
+      max-width: 700px;
+      margin: 60px auto;
+      background: rgba(0,0,0,0.75);
+      padding: 30px;
+      border-radius: 16px;
+      font-size: 1.1em;
+      box-shadow: 0 0 20px #000;
+    }
+    .cutscene p {
+      margin-bottom: 20px;
+      min-height: 80px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <audio autoplay>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/23/audio_0fe5d8c922.mp3?filename=after-battle-epic-piano-111188.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="cutscene">
+    <p id="text">Memuat cerita lanjutan...</p>
+    <button class="btn" onclick="nextLine()">Lanjut</button>
+  </div>
+
+  <script>
+    const cerita = [
+      "Setelah mengalahkan Boss Dimensi, kamu kembali ke Guild...",
+      "Tapi seluruh penjuru negeri mulai dilanda kegelapan baru...",
+      "'Monster yang kamu kalahkan... hanyalah salah satu dari tujuh penjaga dimensi.'",
+      "Petualanganmu masih panjang... dunia bergantung padamu...",
+      "Chapter 2 akan segera dimulai..."
+    ];
+
+    let index = 0;
+    let isTyping = false;
+    let typingInterval = null;
+
+    function typeText(line, callback) {
+      const text = document.getElementById("text");
+      text.innerHTML = "";
+      let i = 0;
+      isTyping = true;
+
+      typingInterval = setInterval(() => {
+        const char = line.charAt(i);
+        text.innerHTML += char === " " ? "&nbsp;" : char;
+        i++;
+        if (i === line.length) {
+          clearInterval(typingInterval);
+          isTyping = false;
+          if (callback) callback();
+        }
+      }, 40);
+    }
+
+    function nextLine() {
+      const text = document.getElementById("text");
+
+      if (isTyping) {
+        clearInterval(typingInterval);
+        text.innerHTML = cerita[index - 1].replace(/ /g, "&nbsp;");
+        isTyping = false;
+        return;
+      }
+
+      if (index < cerita.length) {
+        typeText(cerita[index]);
+        index++;
+      } else {
+        window.location.href = "map.html";
+      }
+    }
+
+    window.onload = () => {
+      nextLine();
+    };
+  </script>
+</body>
+</html>

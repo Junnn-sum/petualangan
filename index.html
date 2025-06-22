@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mulai Petualangan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Selamat Datang di Dunia Petualangan!</h1>
+    <input type="text" id="nickname" placeholder="Masukkan Nama Anda"><br>
+
+    <div id="class-selection">
+        <div class="card" onclick="chooseClass('Warrior')">⚔️ Warrior</div>
+        <div class="card" onclick="chooseClass('Mage')">🪄 Mage</div>
+        <div class="card" onclick="chooseClass('Fighter')">🥊 Fighter</div>
+        <div class="card" onclick="chooseClass('Marksman')">🏹 Marksman</div>
+        <div class="card" onclick="chooseClass('Support')">💖 Support</div>
+        <div class="card" onclick="chooseClass('Tank')">🛡️ Tank</div>
+    </div>
+
+    <p id="chosen-class">Kelas yang dipilih: -</p>
+    <button onclick="startGame()">Mulai Petualangan</button>
+
+    <script>
+        let chosenClass = "";
+
+        function chooseClass(cls) {
+            chosenClass = cls;
+            document.getElementById("chosen-class").innerText = "Kelas yang dipilih: " + cls;
+        }
+
+        function startGame() {
+            const name = document.getElementById("nickname").value.trim();
+            if (!name || !chosenClass) {
+                alert("Masukkan nama dan pilih kelas terlebih dahulu!");
+                return;
+            }
+            localStorage.setItem("nickname", name);
+            localStorage.setItem("class", chosenClass);
+            localStorage.setItem("level", 1);
+            localStorage.setItem("exp", 0);
+            localStorage.setItem("health", 100);
+            localStorage.setItem("gold", 100);
+            localStorage.setItem("inventory", "[]");
+            window.location.href = "map.html";
+        }
+        localStorage.setItem("usedUltimate", "false");
+
+        if (!localStorage.getItem("introSelesai")) {
+            window.location.href = "intro.html";
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Bar Petualang</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🍺 Bar Petualang</h1>
+  <p>Tempat berkumpulnya para petualang. Ayo rileks sejenak!</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div class="grid">
+    <button class="btn" onclick="drinkBeer()">🍻 Minum Bir</button>
+    <button class="btn" onclick="drinkTeh()">🍵 Minum Teh Herbal</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <p class="info" id="result">Apa yang ingin kamu nikmati?</p>
+
+  <script>
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function drinkBeer() {
+      let hp = parseInt(localStorage.getItem("health") || 100);
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      if (gold < 20) {
+        document.getElementById("result").innerText = "💸 Kamu tidak punya cukup gold untuk bir!";
+        return;
+      }
+      gold -= 20;
+      const outcome = Math.random();
+      if (outcome < 0.6) {
+        hp = Math.min(hp + 20, 100);
+        document.getElementById("result").innerText = "🍻 Bir menyegarkan! +20 HP";
+      } else {
+        hp -= 15;
+        document.getElementById("result").innerText = "🤢 Kamu mabuk... -15 HP";
+      }
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("health", hp);
+      checkDeath();
+      updateHUD();
+    }
+
+    function drinkTeh() {
+      let hp = parseInt(localStorage.getItem("health") || 100);
+      let exp = parseInt(localStorage.getItem("exp") || 0);
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      if (gold < 30) {
+        document.getElementById("result").innerText = "💸 Teh herbal terlalu mahal untukmu.";
+        return;
+      }
+      gold -= 30;
+      exp += 20;
+      hp = Math.min(hp + 10, 100);
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("health", hp);
+      localStorage.setItem("exp", exp);
+      document.getElementById("result").innerText = "🍵 Teh herbal membuatmu tenang. +10 HP, +20 EXP";
+      updateHUD();
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    function checkDeath() {
+      const hp = parseInt(localStorage.getItem("health") || 0);
+      if (hp <= 0) {
+        alert("☠️ Kamu mati karena terlalu banyak minum... Petualangan berakhir!");
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

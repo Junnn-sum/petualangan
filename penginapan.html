@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Penginapan Damai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🛏️ Penginapan Damai</h1>
+  <p>Tempat istirahat yang nyaman untuk petualang lelah. Tidur = HP penuh.</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div class="grid">
+    <button class="btn" onclick="rest()">😴 Tidur (50 Gold)</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <p class="info" id="result">Butuh istirahat?</p>
+
+  <script>
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function rest() {
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      if (gold < 50) {
+        document.getElementById("result").innerText = "💸 Kamu tidak punya cukup gold untuk tidur.";
+        return;
+      }
+      gold -= 50;
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("health", 100);
+      document.getElementById("result").innerText = "😴 Kamu tidur nyenyak. HP dipulihkan ke 100.";
+      updateHUD();
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

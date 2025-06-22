@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Peta Dunia</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .grid-map {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .tile {
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: #f9f9f9;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tile:hover {
+      background: #e0f0ff;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>🌍 Peta Dunia</h1>
+  <p>Pilih lokasi untuk menjelajah:</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div class="grid-map">
+    <div class="tile" onclick="go('hutan.html')">🌳 Hutan</div>
+    <div class="tile" onclick="go('sungai.html')">🏞️ Sungai</div>
+    <div class="tile" onclick="go('guild.html')">🛡️ Guild</div>
+    <div class="tile" onclick="go('dungeon.html')">🕳️ Dungeon</div>
+    <div class="tile" onclick="go('bar.html')">🍺 Bar</div>
+    <div class="tile" onclick="go('penginapan.html')">🛏️ Penginapan</div>
+    <div class="tile" onclick="go('toko.html')">🛒 Toko</div>
+    <div class="tile" onclick="go('boss.html')">🐉 Boss</div>
+    <div class="tile" onclick="go('casino.html')">🎰 Casino</div>
+    <div class="tile" onclick="go('map.html')">📍 Kembali ke Peta Lama</div>
+  </div>
+
+  <script>
+    function go(page) {
+      window.location.href = page;
+    }
+
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

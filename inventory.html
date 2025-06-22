@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .item-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px auto;
+      width: 300px;
+      box-shadow: 0 0 5px #ccc;
+      text-align: center;
+    }
+    .btn {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎒 Inventory</h1>
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div id="inventoryList"></div>
+
+  <div style="text-align:center;">
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <script>
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const equipped = localStorage.getItem("equippedItem") || "Tidak ada";
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🗡️ Equip: ${equipped}`;
+    }
+
+    function showInventory() {
+      const area = document.getElementById("inventoryList");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      const equipped = localStorage.getItem("equippedItem");
+      area.innerHTML = "";
+
+      if (inv.length === 0) {
+        area.innerHTML = "<p>Kamu tidak memiliki item.</p>";
+        return;
+      }
+
+      inv.forEach((item, index) => {
+        area.innerHTML += `
+          <div class="item-box">
+            <strong>${item}</strong><br>
+            ${equipped === item ? "✅ Sedang digunakan" : `<button class="btn" onclick="equip('${item}')">🔧 Equip</button>`}
+          </div>
+        `;
+      });
+    }
+
+    function equip(item) {
+      localStorage.setItem("equippedItem", item);
+      alert("🛡️ Kamu kini menggunakan: " + item);
+      updateHUD();
+      showInventory();
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+    showInventory();
+  </script>
+</body>
+</html>

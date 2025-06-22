@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cutscene: Setelah Boss</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1587293852726-70cdb56c2861?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+
+        .cutscene {
+            max-width: 700px;
+            margin: 60px auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 16px;
+            font-size: 1.1em;
+            box-shadow: 0 0 20px #000;
+        }
+
+        .cutscene p {
+            margin-bottom: 20px;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <audio autoplay>
+        <source
+            src="https://cdn.pixabay.com/download/audio/2022/03/23/audio_aa27dfbbbd.mp3?filename=dark-triumph-111158.mp3"
+            type="audio/mpeg">
+    </audio>
+
+    <div class="cutscene">
+        <p id="text">Memuat cerita...</p>
+        <button class="btn" onclick="nextLine()">Lanjut</button>
+    </div>
+
+    <script>
+        let isTyping = false;
+        let typingInterval = null;
+
+        const cerita = [
+            "Kamu berhasil mengalahkan Boss Dimensi...",
+            "Namun saat debu mengendap, kamu mendengar suara misterius...",
+            "'Kau pikir ini akhir...? Ini baru permulaan...'",
+            "Langit mulai retak... portal dimensi lain mulai terbuka...",
+            "Petualanganmu belum selesai... Dunia masih membutuhkanmu."
+        ];
+
+        let index = 0;
+
+        function typeText(line, callback) {
+            const text = document.getElementById("text");
+            text.innerHTML = "";
+            let i = 0;
+            isTyping = true;
+
+            typingInterval = setInterval(() => {
+                const char = line.charAt(i);
+                text.innerHTML += char === " " ? "&nbsp;" : char;
+                i++;
+                if (i === line.length) {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            }, 40);
+        }
+
+
+
+        function nextLine() {
+            const text = document.getElementById("text");
+
+            // kalau sedang mengetik, langsung tampilkan penuh
+            if (isTyping) {
+                clearInterval(typingInterval);
+                text.innerHTML = cerita[index - 1].replace(/ /g, "&nbsp;");
+                isTyping = false;
+                return;
+            }
+
+            if (index < cerita.length) {
+                typeText(cerita[index]);
+                index++;
+            } else {
+                window.location.href = "index.html"; // atau map.html jika cutscene tengah
+            }
+        }
+
+
+        window.onload = () => {
+            nextLine();
+        };
+    </script>
+</body>
+
+</html>

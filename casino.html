@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Casino Petualang</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .slot { font-size: 2.5em; letter-spacing: 20px; margin: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🎰 Casino Petualang</h1>
+  <p>Cobalah keberuntunganmu! (Biaya: 20 Gold)</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+  <div class="slot" id="slots">❔ ❔ ❔</div>
+
+  <div class="grid">
+    <button class="btn" onclick="spin()">🎲 Putar Slot</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <p class="info" id="result">Ayo coba peruntunganmu...</p>
+
+  <script>
+    const symbols = ["🔥", "💎", "🍀", "💀", "🐉"];
+
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function spin() {
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      const result = document.getElementById("result");
+      if (gold < 20) {
+        result.innerText = "💸 Gold kamu tidak cukup untuk bermain!";
+        return;
+      }
+
+      gold -= 20;
+      localStorage.setItem("gold", gold);
+
+      const slot1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const slot2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const slot3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      document.getElementById("slots").innerText = `${slot1} ${slot2} ${slot3}`;
+
+      let reward = 0;
+      if (slot1 === slot2 && slot2 === slot3) {
+        reward = 100;
+        result.innerText = "🎉 Jackpot! 3 simbol sama! +100 Gold";
+      } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
+        reward = 30;
+        result.innerText = "😊 Lumayan! 2 simbol sama! +30 Gold";
+      } else {
+        result.innerText = "😢 Zonk! Tidak ada yang cocok.";
+      }
+
+      gold += reward;
+      localStorage.setItem("gold", gold);
+      updateHUD();
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Boss Challenge</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .boss-status {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐉 Boss Challenge</h1>
+  <p>Boss kuat muncul! Kalahkan dia untuk hadiah besar!</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+  <div class="boss-status" id="boss">❤️ Boss HP: 200</div>
+
+  <div class="grid">
+    <button class="btn" onclick="useSkill('quick')">⚔️ Serangan Cepat</button>
+    <button class="btn" onclick="useSkill('strong')">💥 Serangan Kuat</button>
+    <button class="btn" onclick="useSkill('ultimate')">🔥 Ultimate</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali</button>
+  </div>
+
+  <p class="info" id="result">Ayo kalahkan boss-nya!</p>
+
+  <script>
+    let bossHP = 200;
+
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+      document.getElementById("boss").innerText = "❤️ Boss HP: " + bossHP;
+    }
+
+    function useSkill(type) {
+      let playerHP = parseInt(localStorage.getItem("health") || 100);
+      let result = document.getElementById("result");
+      let dmg = 0;
+
+      if (type === "quick") {
+        dmg = Math.floor(Math.random() * 21) + 20;
+        gainExp(10);
+      } else if (type === "strong") {
+        dmg = Math.floor(Math.random() * 21) + 50;
+        playerHP -= 10;
+      } else if (type === "ultimate") {
+        if (localStorage.getItem("usedUltimate") === "true") {
+          result.innerText = "🔥 Kamu sudah memakai Ultimate!";
+          return;
+        }
+        localStorage.setItem("usedUltimate", "true");
+        dmg = 100;
+        gainExp(25);
+      }
+
+      bossHP -= dmg;
+      result.innerText = `🗡️ Kamu menyerang Boss dan memberi ${dmg} DMG!`;
+
+      if (bossHP <= 0) {
+        result.innerText += "\n🎉 Kamu mengalahkan Boss! +200 EXP, +100 Gold, Item Legendaris!";
+        gainExp(200);
+        let gold = parseInt(localStorage.getItem("gold") || 0);
+        localStorage.setItem("gold", gold + 100);
+        let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+        inv.push("Pedang Legendaris");
+        localStorage.setItem("inventory", JSON.stringify(inv));
+        bossHP = 0;
+        window.location.href = "cutscene-boss.html";
+        localStorage.setItem("bossSelesai", "true");
+
+
+      } else {
+        // boss serang balik
+        const bossDmg = Math.floor(Math.random() * 16) + 10;
+        playerHP -= bossDmg;
+        result.innerText += `\n😡 Boss menyerang balik dan memberi ${bossDmg} DMG!`;
+      }
+
+      if (playerHP <= 0) {
+        alert("☠️ Kamu dikalahkan Boss! Game over.");
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
+
+      localStorage.setItem("health", playerHP);
+      updateHUD();
+    }
+
+    function gainExp(amount) {
+      let exp = parseInt(localStorage.getItem("exp") || 0);
+      let level = parseInt(localStorage.getItem("level") || 1);
+      exp += amount;
+      if (exp >= level * 100) {
+        level++;
+        exp = 0;
+        localStorage.setItem("level", level);
+        localStorage.setItem("health", 100); // Pulihkan HP saat naik level
+        alert("🎉 Level Up ke " + level + "! HP dipulihkan!");
+      }
+      localStorage.setItem("exp", exp);
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+
+
+    updateHUD();
+  </script>
+</body>
+</html>

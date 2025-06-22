@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Peta Lokasi Petualangan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="player-info" id="playerInfo">Memuat data...</div>
+
+    <div class="grid">
+        <button class="btn">🏡 Desa</button>
+        <button class="btn" onclick="window.location.href='hutan.html'">🌳 Hutan</button>
+        <button class="btn" onclick="window.location.href='dungeon.html'">🕳️ Dungeon</button>
+        <button class="btn" onclick="window.location.href='guild.html'">🛡️ Guild</button>
+        <button class="btn" onclick="window.location.href='sungai.html'">🏞️ Sungai</button>
+        <button class="btn" onclick="window.location.href='bar.html'">🍺 Bar</button>
+        <button class="btn" onclick="window.location.href='penginapan.html'">🛏️ Penginapan</button>
+        <button class="btn" onclick="window.location.href='toko.html'">🛒 Toko</button>
+        <button class="btn" onclick="window.location.href='save.html'">💾 Simpan / Muat</button>
+        <button class="btn" onclick="window.location.href='casino.html'">🎰 Casino</button>
+        <button class="btn" onclick="window.location.href='boss.html'">🐉 Boss Challenge</button>
+        <button class="btn" onclick="window.location.href='worldmap.html'">🌍 World Map</button>
+        <button class="btn" onclick="window.location.href='inventory.html'">🎒 Inventory</button>
+
+
+    </div>
+
+    <p class="info">Klik lokasi untuk menjelajah</p>
+
+    <script>
+        const name = localStorage.getItem("nickname") || "Petualang";
+        const classType = localStorage.getItem("class") || "???";
+        document.getElementById("playerInfo").innerText = `Nama: ${name} | Class: ${classType}`;
+
+        document.querySelectorAll(".btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                alert("Menuju lokasi: " + btn.innerText.trim());
+            });
+        });
+    </script>
+</body>
+
+</html>

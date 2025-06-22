@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Save & Load</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    textarea {
+      width: 90%;
+      height: 120px;
+      margin: 10px auto;
+      display: block;
+    }
+    .btn {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💾 Simpan / Muat Game</h1>
+  <p>Gunakan fitur ini untuk menyimpan dan memuat progres game kamu secara manual.</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <div style="text-align:center;">
+    <button class="btn" onclick="generateSave()">📤 Simpan Game</button>
+    <button class="btn" onclick="loadSave()">📥 Muat Game</button>
+    <button class="btn" onclick="resetGame()">♻️ Reset Semua</button>
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <textarea id="saveData" placeholder="Data save akan muncul di sini..."></textarea>
+
+  <script>
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}`;
+    }
+
+    function generateSave() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+      const encoded = btoa(JSON.stringify(data));
+      document.getElementById("saveData").value = encoded;
+    }
+
+    function loadSave() {
+      try {
+        const input = document.getElementById("saveData").value.trim();
+        const decoded = JSON.parse(atob(input));
+        localStorage.clear();
+        for (const key in decoded) {
+          localStorage.setItem(key, decoded[key]);
+        }
+        alert("✅ Data berhasil dimuat!");
+        updateHUD();
+      } catch (e) {
+        alert("❌ Data tidak valid!");
+      }
+    }
+
+    function resetGame() {
+      if (confirm("Yakin ingin menghapus semua data?")) {
+        localStorage.clear();
+        alert("Data game dihapus.");
+        updateHUD();
+      }
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+  </script>
+</body>
+</html>

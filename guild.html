@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Guild Petualang</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .mission {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px auto;
+      max-width: 600px;
+      box-shadow: 0 0 10px #ccc;
+      text-align: left;
+    }
+
+    .mission h3 {
+      margin-top: 0;
+    }
+
+    .btn {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🛡️ Guild Petualang</h1>
+  <p>Ambil misi, klaim hadiah, dan tunjukkan bahwa kamu petualang sejati!</p>
+
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+  <div id="mission-area"></div>
+  <div style="text-align:center;">
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <script>
+    const allMissions = [
+      {
+        id: "hutan_monster",
+        nama: "Bunuh 3 monster di Hutan",
+        cek: () => parseInt(localStorage.getItem("monsterHutan") || 0) >= 3,
+        rewardExp: 100,
+        rewardGold: 50
+      },
+      {
+        id: "dungeon_relic",
+        nama: "Ambil Relik dari Dungeon",
+        cek: () => (JSON.parse(localStorage.getItem("inventory") || "[]")).includes("Relik Kuno"),
+        rewardExp: 120,
+        rewardGold: 80
+      },
+      {
+        id: "boss_clear",
+        nama: "Kalahkan Boss Dimensi",
+        cek: () => localStorage.getItem("bossSelesai") === "true",
+        rewardExp: 200,
+        rewardGold: 150
+      }
+    ];
+
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function loadMissionUI() {
+      const area = document.getElementById("mission-area");
+      const completed = JSON.parse(localStorage.getItem("completedMissions") || "[]");
+      const current = JSON.parse(localStorage.getItem("currentMission") || "null");
+
+      area.innerHTML = "";
+
+      if (!current) {
+        area.innerHTML += "<p>Pilih salah satu misi berikut:</p>";
+        for (const m of allMissions) {
+          if (completed.includes(m.id)) continue;
+          area.innerHTML += `
+            <div class="mission">
+              <h3>${m.nama}</h3>
+              <p>Status: ⏳ Belum diambil</p>
+              <button class="btn" onclick="ambilMisi('${m.id}')">📜 Ambil Misi</button>
+            </div>
+          `;
+        }
+      } else {
+        const misi = allMissions.find(m => m.id === current.id);
+        const selesai = misi.cek();
+
+        area.innerHTML += `
+          <div class="mission">
+            <h3>Misi Aktif: ${misi.nama}</h3>
+            <p>Status: ${selesai ? "✅ Misi selesai!" : "⏳ Belum selesai"}</p>
+        `;
+
+        if (selesai) {
+          area.innerHTML += `<button class="btn" onclick="klaimMisi()">🎁 Klaim Hadiah</button>`;
+        } else {
+          area.innerHTML += `<p>Kerjakan misi ini sebelum kembali ke sini.</p>`;
+        }
+
+        area.innerHTML += `</div>`;
+      }
+    }
+
+    function ambilMisi(id) {
+      const misi = allMissions.find(m => m.id === id);
+      if (!misi) return;
+      localStorage.setItem("currentMission", JSON.stringify({ id: misi.id }));
+      loadMissionUI();
+    }
+
+    function klaimMisi() {
+      const current = JSON.parse(localStorage.getItem("currentMission") || "null");
+      if (!current) return;
+
+      const misi = allMissions.find(m => m.id === current.id);
+      if (!misi || !misi.cek()) return;
+
+      gainExp(misi.rewardExp);
+      addGold(misi.rewardGold);
+
+      let completed = JSON.parse(localStorage.getItem("completedMissions") || "[]");
+      completed.push(misi.id);
+      localStorage.setItem("completedMissions", JSON.stringify(completed));
+      localStorage.removeItem("currentMission");
+
+      alert(`🎉 Misi "${misi.nama}" diselesaikan!\n+${misi.rewardExp} EXP, +${misi.rewardGold} Gold`);
+
+      if (misi.id === "boss_clear") {
+        window.location.href = "cutscene-lanjutan.html";
+      } else {
+        updateHUD();
+        loadMissionUI();
+      }
+    }
+
+    function gainExp(amount) {
+      let exp = parseInt(localStorage.getItem("exp") || 0);
+      let level = parseInt(localStorage.getItem("level") || 1);
+      exp += amount;
+      if (exp >= level * 100) {
+        level++;
+        exp = 0;
+        localStorage.setItem("level", level);
+        localStorage.setItem("health", 100);
+        alert("🎉 Level Up ke " + level + "! HP dipulihkan!");
+      }
+      localStorage.setItem("exp", exp);
+    }
+
+    function addGold(amount) {
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      gold += amount;
+      localStorage.setItem("gold", gold);
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+    loadMissionUI();
+  </script>
+</body>
+
+</html>

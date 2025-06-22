@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Toko Item</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .shop-section {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    .item-box {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px;
+      box-shadow: 0 0 5px #ccc;
+      width: 200px;
+      text-align: center;
+    }
+    .btn {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Toko Petualang</h1>
+  <div class="player-hud" id="hud">Memuat data pemain...</div>
+
+  <h2>🎁 Beli Item</h2>
+  <div class="shop-section" id="buySection"></div>
+
+  <h2>💰 Jual Item</h2>
+  <div class="shop-section" id="sellSection"></div>
+
+  <div style="text-align:center;">
+    <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+  </div>
+
+  <script>
+    const itemsForSale = [
+      { name: "Potion", price: 20 },
+      { name: "Pedang Kayu", price: 40 },
+      { name: "Armor Kulit", price: 50 }
+    ];
+
+    function updateHUD() {
+      const hud = document.getElementById("hud");
+      const name = localStorage.getItem("nickname");
+      const classType = localStorage.getItem("class");
+      const level = localStorage.getItem("level");
+      const exp = localStorage.getItem("exp");
+      const hp = localStorage.getItem("health");
+      const gold = localStorage.getItem("gold");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+    }
+
+    function renderShop() {
+      const buyDiv = document.getElementById("buySection");
+      const sellDiv = document.getElementById("sellSection");
+      const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+
+      buyDiv.innerHTML = "";
+      sellDiv.innerHTML = "";
+
+      itemsForSale.forEach(item => {
+        buyDiv.innerHTML += `
+          <div class="item-box">
+            <strong>${item.name}</strong><br>
+            💰 ${item.price} Gold<br>
+            <button class="btn" onclick="beli('${item.name}', ${item.price})">Beli</button>
+          </div>
+        `;
+      });
+
+      inv.forEach((item, index) => {
+        sellDiv.innerHTML += `
+          <div class="item-box">
+            <strong>${item}</strong><br>
+            💰 ${Math.floor(getItemValue(item) / 2)} Gold<br>
+            <button class="btn" onclick="jual(${index})">Jual</button>
+          </div>
+        `;
+      });
+    }
+
+    function getItemValue(name) {
+      const found = itemsForSale.find(i => i.name === name);
+      return found ? found.price : 20;
+    }
+
+    function beli(nama, harga) {
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      if (gold < harga) {
+        alert("💸 Gold tidak cukup!");
+        return;
+      }
+      gold -= harga;
+      let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      inv.push(nama);
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("inventory", JSON.stringify(inv));
+      updateHUD();
+      renderShop();
+    }
+
+    function jual(index) {
+      let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+      const item = inv[index];
+      const harga = Math.floor(getItemValue(item) / 2);
+      inv.splice(index, 1);
+      let gold = parseInt(localStorage.getItem("gold") || 0);
+      gold += harga;
+      localStorage.setItem("gold", gold);
+      localStorage.setItem("inventory", JSON.stringify(inv));
+      updateHUD();
+      renderShop();
+    }
+
+    function goBack() {
+      window.location.href = "map.html";
+    }
+
+    updateHUD();
+    renderShop();
+  </script>
+</body>
+</html>

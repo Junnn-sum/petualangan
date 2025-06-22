@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dungeon Gelap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>🕳️ Dungeon Gelap</h1>
+    <p>Di tempat ini bersemayam monster kuat dan rahasia kuno...</p>
+
+    <div class="player-hud" id="hud">Memuat data pemain...</div>
+    <audio autoplay loop>
+        <source src="dungeon.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="grid">
+        <button class="btn" onclick="useSkill('quick')">⚔️ Serangan Cepat</button>
+        <button class="btn" onclick="useSkill('strong')">💥 Serangan Kuat</button>
+        <button class="btn" onclick="useSkill('defend')">🛡️ Bertahan</button>
+        <button class="btn" onclick="useSkill('ultimate')">🔥 Ultimate</button>
+
+        <button class="btn" onclick="fightBoss()">👹 Lawan Boss Dungeon</button>
+        <button class="btn" onclick="goBack()">🔙 Kembali ke Peta</button>
+    </div>
+
+    <p class="info" id="result">Bersiaplah...</p>
+
+    <script>
+        function useSkill(type) {
+            let result = document.getElementById("result");
+
+            if (type === "quick") {
+                const dmg = Math.floor(Math.random() * 21) + 20; // 20–40
+                gainExp(15);
+                result.innerText = `⚔️ Serangan Cepat berhasil! Musuh terkena ${dmg} DMG\n+15 EXP`;
+            }
+
+            else if (type === "strong") {
+                const dmg = Math.floor(Math.random() * 21) + 50; // 50–70
+                damage(10);
+                result.innerText = `💥 Serangan Kuat mengenai musuh sebesar ${dmg} DMG\n-10 HP untukmu`;
+            }
+
+            else if (type === "defend") {
+                let hp = parseInt(localStorage.getItem("health") || 100);
+                hp = Math.min(hp + 10, 100);
+                localStorage.setItem("health", hp);
+                result.innerText = `🛡️ Kamu bertahan dan memulihkan +10 HP`;
+            }
+
+            else if (type === "ultimate") {
+                const used = localStorage.getItem("usedUltimate") === "true";
+                if (used) {
+                    result.innerText = "🔥 Kamu sudah menggunakan Ultimate hari ini!";
+                } else {
+                    localStorage.setItem("usedUltimate", "true");
+                    result.innerText = "🔥🔥 Serangan Ultimate menghancurkan musuh dengan 100 DMG!";
+                    gainExp(50);
+                }
+            }
+
+            updateHUD();
+        }
+
+        function updateHUD() {
+            const hud = document.getElementById("hud");
+            const name = localStorage.getItem("nickname");
+            const classType = localStorage.getItem("class");
+            const level = localStorage.getItem("level");
+            const exp = localStorage.getItem("exp");
+            const hp = localStorage.getItem("health");
+            const gold = localStorage.getItem("gold");
+            const inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            hud.innerHTML = `${name} | Class: ${classType} | 💖 HP: ${hp} | ⭐ EXP: ${exp} | 🔺 Lv: ${level} | 💰 Gold: ${gold}<br>🎒 ${inv.join(", ") || "Kosong"}`;
+        }
+
+        function fightBoss() {
+            let result = document.getElementById("result");
+            let chance = Math.random();
+            if (chance > 0.7) {
+                result.innerText = "🏆 Kamu berhasil mengalahkan Boss Dungeon!\n+100 EXP, +150 Gold";
+                gainExp(100); addGold(150); addItem("Relik Kuno");
+                // Tambahkan saat player menang dan mendapatkan Relik
+                let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+                if (!inv.includes("Relik Kuno")) {
+                    inv.push("Relik Kuno");
+                    localStorage.setItem("inventory", JSON.stringify(inv));
+                }
+
+            } else {
+                result.innerText = "☠️ Kamu kalah dan kehilangan 30 HP!";
+                damage(30);
+            }
+            updateHUD();
+        }
+
+        function goBack() {
+            window.location.href = "map.html";
+        }
+
+        function gainExp(amount) {
+            let exp = parseInt(localStorage.getItem("exp") || 0);
+            let level = parseInt(localStorage.getItem("level") || 1);
+            exp += amount;
+            if (exp >= level * 100) {
+                level++;
+                exp = 0;
+                localStorage.setItem("level", level);
+                localStorage.setItem("health", 100); // 🎉 Pulihkan HP saat level up
+                alert("🎉 Level Up ke " + level + "! HP dipulihkan penuh!");
+            }
+            localStorage.setItem("exp", exp);
+        }
+
+
+        function addGold(amount) {
+            let gold = parseInt(localStorage.getItem("gold") || 0);
+            gold += amount;
+            localStorage.setItem("gold", gold);
+        }
+
+        function addItem(item) {
+            let inv = JSON.parse(localStorage.getItem("inventory") || "[]");
+            inv.push(item);
+            localStorage.setItem("inventory", JSON.stringify(inv));
+        }
+
+        function damage(amount) {
+            let hp = parseInt(localStorage.getItem("health") || 100);
+            hp -= amount;
+            if (hp < 0) hp = 0;
+            localStorage.setItem("health", hp);
+            checkDeath();
+        }
+
+        function checkDeath() {
+            const hp = parseInt(localStorage.getItem("health") || 0);
+            if (hp <= 0) {
+                alert("☠️ Kamu mati... petualangan harus dimulai kembali!");
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        }
+
+        updateHUD();
+    </script>
+</body>
+
+</html>

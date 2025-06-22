@@ -1,113 +1,101 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Awal Cerita</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            background: url('https://images.unsplash.com/photo-1601297183300-93465af9f82b?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-        }
-
-        .cutscene {
-            max-width: 700px;
-            margin: 60px auto;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 30px;
-            border-radius: 16px;
-            font-size: 1.1em;
-            box-shadow: 0 0 20px #000;
-        }
-
-        .cutscene p {
-            margin-bottom: 20px;
-            min-height: 80px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-            background: #fff;
-            border: none;
-            border-radius: 8px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Intro Petualangan</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1613553507746-b168a07b1179?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .cutscene {
+      max-width: 700px;
+      margin: 60px auto;
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 16px;
+      font-size: 1.1em;
+      box-shadow: 0 0 20px #000;
+    }
+    .cutscene p {
+      min-height: 80px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-
 <body>
-    <audio autoplay>
-        <source
-            src="https://cdn.pixabay.com/download/audio/2022/03/23/audio_8f2d56090c.mp3?filename=epic-cinematic-intro-111176.mp3"
-            type="audio/mpeg">
-    </audio>
+  <audio autoplay>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/23/audio_4f956d4f9a.mp3?filename=fantasy-intro-111164.mp3" type="audio/mpeg">
+  </audio>
 
-    <div class="cutscene">
-        <p id="text">Memuat cerita...</p>
-        <button class="btn" onclick="nextLine()">Lanjut</button>
-    </div>
+  <div class="cutscene">
+    <p id="text">Memuat cerita...</p>
+    <button class="btn" onclick="nextLine()">Lanjut</button>
+  </div>
 
-    <script>
-        let isTyping = false;
-        let typingInterval = null;
+  <script>
+    const cerita = [
+      "Di dunia yang hancur karena perang antar dimensi...",
+      "Para petualang dari berbagai ras berkumpul di sebuah Guild...",
+      "Kamu adalah salah satunya... dengan takdir besar menanti...",
+      "Petualanganmu akan menentukan masa depan dunia ini..."
+    ];
 
-        const cerita = [
-            "Di dunia bernama Aetheris, keseimbangan mulai runtuh... ",
-            "Monster dari dimensi gelap muncul dan menghancurkan desa-desa.",
-            "Penduduk berharap pada ramalan lama: 'Satu petualang terpilih akan muncul...'",
-            "Petualang itu adalah kamu.",
-            "Sekarang, bersiaplah memilih jalanmu dan menentukan takdirmu..."
-        ];
+    let index = 0;
+    let isTyping = false;
+    let typingInterval = null;
 
-        let index = 0;
+    function typeText(line, callback) {
+      const text = document.getElementById("text");
+      text.innerHTML = "";
+      let i = 0;
+      isTyping = true;
 
-        function typeText(line, callback) {
-            const text = document.getElementById("text");
-            text.innerHTML = "";
-            let i = 0;
-            isTyping = true;
-
-            typingInterval = setInterval(() => {
-                const char = line.charAt(i);
-                text.innerHTML += char === " " ? "&nbsp;" : char;
-                i++;
-                if (i === line.length) {
-                    clearInterval(typingInterval);
-                    isTyping = false;
-                    if (callback) callback();
-                }
-            }, 40);
+      typingInterval = setInterval(() => {
+        const char = line.charAt(i);
+        text.innerHTML += char === " " ? "&nbsp;" : char;
+        i++;
+        if (i === line.length) {
+          clearInterval(typingInterval);
+          isTyping = false;
+          if (callback) callback();
         }
+      }, 40);
+    }
 
+    function nextLine() {
+      const text = document.getElementById("text");
 
+      if (isTyping) {
+        clearInterval(typingInterval);
+        text.innerHTML = cerita[index - 1].replace(/ /g, "&nbsp;");
+        isTyping = false;
+        return;
+      }
 
-        function nextLine() {
-            const text = document.getElementById("text");
+      if (index < cerita.length) {
+        typeText(cerita[index]);
+        index++;
+      } else {
+        // ✅ Tandai bahwa intro selesai agar tidak diulang
+        localStorage.setItem("introSelesai", "true");
+        window.location.href = "index.html"; // atau halaman start
+      }
+    }
 
-            // kalau sedang mengetik, langsung tampilkan penuh
-            if (isTyping) {
-                clearInterval(typingInterval);
-                text.innerHTML = cerita[index - 1].replace(/ /g, "&nbsp;");
-                isTyping = false;
-                return;
-            }
-
-            if (index < cerita.length) {
-                typeText(cerita[index]);
-                index++;
-            } else {
-                window.location.href = "index.html"; // atau map.html jika cutscene tengah
-            }
-        }
-
-
-        window.onload = () => {
-            nextLine();
-        };
-    </script>
+    window.onload = () => {
+      nextLine();
+    };
+  </script>
 </body>
-
 </html>
